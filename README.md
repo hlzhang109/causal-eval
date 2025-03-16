@@ -2,6 +2,26 @@
 
 This repository contains essential files and directories structured for efficient project organization.
 
+## Environment
+
+### Training
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv venv envs/eval --python 3.11 && source envs/eval/bin/activate  && uv pip install pip
+uv pip install transformers datasets torch trl
+```
+
+### Evaluation
+
+```bash
+git clone git@github.com:huggingface/lm-evaluation-harness.git
+cd lm-evaluation-harness
+git checkout main
+uv pip install -e .
+bash eval.sh
+```
+
 ## 📁 Directory Structure
 
 / (Root Directory) 
