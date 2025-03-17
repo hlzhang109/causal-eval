@@ -2,4 +2,4 @@ debug*
 
 envs/
 lm-evaluation-harness/
-outs/
+# outs/

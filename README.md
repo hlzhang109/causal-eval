@@ -19,6 +19,20 @@ git clone git@github.com:huggingface/lm-evaluation-harness.git
 cd lm-evaluation-harness
 git checkout main
 uv pip install -e .
+```
+
+Double check https://github.com/EleutherAI/lm-evaluation-harness/pull/2772/commits/7207e4ea33df5bd6a10c872f2fac4993ea727067
+envs/eval/lib/python3.11/site-packages/lm_eval/tasks/leaderboard/math/utils.py
+
+Alternatively,
+
+```bash
+uv pip install lm_eval\[vllm\]
+uv pip install langdetect immutabledict antlr4-python3-runtime==4.11
+```
+
+Then,
+```bash
 bash eval.sh
 ```
 
