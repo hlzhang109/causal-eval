@@ -3,3 +3,4 @@ debug*
 envs/
 lm-evaluation-harness/
 # outs/
+*/__pycache__/
