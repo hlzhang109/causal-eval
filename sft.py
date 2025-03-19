@@ -33,6 +33,7 @@ def process_dataset(dataset, dataset_name, ifeval_train):
     return dataset
 
 def fetch_dataset(dataset):
+    dataset_label = ""
     all_datasets = []
     for each_dataset in dataset:
         if "IFEval" in each_dataset:
@@ -61,14 +62,13 @@ def fetch_dataset(dataset):
         combined_dataset = concatenate_datasets(all_datasets)
     else:
         combined_dataset = all_datasets[0]
-    return combined_dataset
+    return combined_dataset, dataset_label
 
 @click.command()
 @click.option("--model_name_or_path", type=str, default="Qwen/Qwen2.5-7B")
 def main(model_name_or_path):
     for dataset in datasets:
-        dataset_label = ""
-        train_dataset = fetch_dataset(dataset)
+        train_dataset, dataset_label = fetch_dataset(dataset)
         sft_config = SFTConfig(max_seq_length=512, packing=True, 
                             per_device_train_batch_size=1, per_device_eval_batch_size=2,
                             output_dir=f"models/{model_name_or_path}/{dataset_label}/")
