@@ -1,6 +1,11 @@
+import os
+import wandb
 import json
 import click
 import torch
+from accelerate import PartialState
+from accelerate import Accelerator
+
 from transformers import AutoModelForCausalLM
 from datasets import load_dataset, concatenate_datasets
 from trl import SFTConfig, SFTTrainer
@@ -8,8 +13,8 @@ from datasets import get_dataset_config_names
 # z1 - BBH, z2 - IFEval, z3 - MATH.
 # IFEval BBH MATH LVl 5 GPQA MUSR MMLU-PRO
 
-datasets = [["lukaemon/bbh"], ["google/IFEval"], ["DigitalLearningGmbH/MATH-lighteval"], 
-            ["lukaemon/bbh", "google/IFEval"], ["google/IFEval", "lukaemon/bbh", "DigitalLearningGmbH/MATH-lighteval"]]
+datasets = [["google/IFEval"], ["lukaemon/bbh"], ["DigitalLearningGmbH/MATH-lighteval"], 
+            ["google/IFEval", "lukaemon/bbh"], ["google/IFEval", "lukaemon/bbh", "DigitalLearningGmbH/MATH-lighteval"]]
 
 input_output_map = {
     "lukaemon/bbh": {"input": "input", "output": "target"},
@@ -20,6 +25,7 @@ input_output_map = {
 labels = dict(zip(datasets[-1], range(1, len(datasets[-1]) + 1)))
 
 print(labels)
+scratch_dir = os.environ["SCRATCH"]
 
 def process_dataset(dataset, dataset_name, ifeval_train):
     if "MATH" in dataset_name:
@@ -67,19 +73,26 @@ def fetch_dataset(dataset):
 @click.command()
 @click.option("--model_name_or_path", type=str, default="Qwen/Qwen2.5-7B")
 def main(model_name_or_path):
+    wandb.init(project="causal-eval", name=model_name_or_path, entity="hanlin-ml")
+    
     for dataset in datasets:
         train_dataset, dataset_label = fetch_dataset(dataset)
         sft_config = SFTConfig(max_seq_length=512, packing=True, 
-                            per_device_train_batch_size=1, per_device_eval_batch_size=2,
-                            output_dir=f"models/{model_name_or_path}/{dataset_label}/")
+                               per_device_train_batch_size=1, per_device_eval_batch_size=2,
+                               output_dir=f"{scratch_dir}/causal-eval/models/{model_name_or_path}/{dataset_label}/")
 
-        model = AutoModelForCausalLM.from_pretrained(model_name_or_path, device_map="auto", torch_dtype=torch.bfloat16,)
+        # device_string = PartialState().process_index
+        model = AutoModelForCausalLM.from_pretrained(model_name_or_path, torch_dtype=torch.bfloat16, device_map="auto",
+                                                     attn_implementation="flash_attention_2") # device_map="auto", device_map={'':device_string}, 
                                                     #  attn_implementation="flash_attention")
+        # accelerator = Accelerator(mixed_precision="bf16")
+        # model = accelerator.prepare_model(model)
+
         trainer = SFTTrainer(
             model,
             train_dataset=train_dataset,
             args=sft_config,
-            tokenizer=None, # The trainer will create a tokenizer from model_name_or_path
+            # tokenizer=None, # The trainer will create a tokenizer from model_name_or_path
         )
         trainer.train()
 

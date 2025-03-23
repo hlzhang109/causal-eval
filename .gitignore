@@ -7,3 +7,4 @@ lm-evaluation-harness/
 
 models
 logs
+wandb

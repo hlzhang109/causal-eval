@@ -8,7 +8,7 @@ This repository contains essential files and directories structured for efficien
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
-uv venv envs/eval --python 3.11 && source envs/eval/bin/activate  && uv pip install pip
+uv venv $SCRATCH/envs/eval --python 3.11 && source $SCRATCH/envs/eval/bin/activate  && uv pip install pip
 uv pip install transformers datasets torch trl
 ```
 
@@ -29,11 +29,21 @@ Alternatively,
 ```bash
 uv pip install lm_eval\[vllm\]
 uv pip install langdetect immutabledict antlr4-python3-runtime==4.11
+uv pip install math-verify==0.7.0
 ```
 
 Then,
 ```bash
 bash eval.sh
+```
+
+Maybe hack the vllm code to allow prompt length = max_model_len.
+```python
+# vllm/v1/engine/processor.py
+if len(prompt_ids) > self.model_config.max_model_len:
+    raise ValueError(
+        f"Prompt length of {len(prompt_ids)} is longer than the "
+        f"maximum model length of {self.model_config.max_model_len}.")
 ```
 
 ## 📁 Directory Structure
