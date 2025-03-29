@@ -1,15 +1,16 @@
 
-source $SCRATCH/envs/eval/bin/activate
+source $SCRATCH/envs/eval2/bin/activate
 
 task_name=leaderboard # ifeval #
 GPUs_per_model=4
 model_replicas=1
 
-for model_name in Qwen/Qwen2.5-7B Qwen/Qwen2.5-14B # meta-llama/Meta-Llama-3-8B google/gemma-2-9b # 
+for model_name in google/gemma-2-9b # Qwen/Qwen2.5-7B # google/gemma-2-9b # Qwen/Qwen2.5-14B # meta-llama/Meta-Llama-3-8B # 
 do
     # Attention: For instruction models add the --apply_chat_template and fewshot_as_multiturn option.
     # data_parallel_size=${model_replicas}
-    gpu_memory_utilization=0.4
+    # gpu_memory_utilization=0.5 # 0.5 for 40GiB Qwen2.5-7B
+    gpu_memory_utilization=0.6
     # if [ "$model_name" == "google/gemma-2-9b" ]; then
     #     gpu_memory_utilization=0.2
     # elif [ "$model_name" == "Qwen/Qwen2.5-14B" ]; then

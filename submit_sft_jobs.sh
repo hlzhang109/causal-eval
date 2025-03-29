@@ -6,7 +6,7 @@
 #SBATCH --job-name=sft_models
 #SBATCH --output=logs/slurm/sft_%A_%a.out
 #SBATCH --error=logs/slurm/sft_%A_%a.err
-#SBATCH --time=24:00:00
+#SBATCH --time=72:00:00
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
@@ -36,15 +36,19 @@ for model in "${MODELS[@]}"; do
 #SBATCH --job-name=sft_${model_name}
 #SBATCH --output=logs/slurm/sft_${model_name}_%j.out
 #SBATCH --error=logs/slurm/sft_${model_name}_%j.err
-#SBATCH --time=24:00:00
+#SBATCH --time=72:00:00
 #SBATCH --mem=32G
-#SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:1
-#SBATCH --partition=kempner
+
+#SBATCH --cpus-per-task=32
+#SBATCH --gres=gpu:4
+#SBATCH --nodes=1
+#SBATCH --partition=kempner_requeue
+#SBATCH --constraint=h100
 #SBATCH --account=kempner_sham_lab
 
 source $SCRATCH/envs/rl/bin/activate
 echo "Running SFT for $model_name"
+nvidia-smi
 python sft.py --model_name_or_path "$model" > logs/sft/${model_name}.log 2>&1
 EOF
     

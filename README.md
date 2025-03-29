@@ -18,7 +18,8 @@ uv pip install transformers datasets torch trl
 git clone git@github.com:huggingface/lm-evaluation-harness.git
 cd lm-evaluation-harness
 git checkout main
-uv pip install -e .
+uv pip install -e . vllm
+uv pip install langdetect immutabledict math-verify
 ```
 
 Double check https://github.com/EleutherAI/lm-evaluation-harness/pull/2772/commits/7207e4ea33df5bd6a10c872f2fac4993ea727067

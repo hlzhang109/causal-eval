@@ -1,4 +1,5 @@
 import os
+import glob
 import wandb
 import json
 import click
@@ -14,15 +15,16 @@ from datasets import get_dataset_config_names
 # IFEval BBH MATH LVl 5 GPQA MUSR MMLU-PRO
 
 datasets = [["google/IFEval"], ["lukaemon/bbh"], ["DigitalLearningGmbH/MATH-lighteval"], 
-            ["google/IFEval", "lukaemon/bbh"], ["google/IFEval", "lukaemon/bbh", "DigitalLearningGmbH/MATH-lighteval"]]
+            ["google/IFEval", "lukaemon/bbh"], ["lukaemon/bbh", "google/IFEval", "DigitalLearningGmbH/MATH-lighteval"]]
+# NOTE debug
+datasets = [["lukaemon/bbh"]]
 
 input_output_map = {
     "lukaemon/bbh": {"input": "input", "output": "target"},
     "google/IFEval": {"input": "prompt", "output": "response"},
     "DigitalLearningGmbH/MATH-lighteval": {"input": "problem", "output": "solution"}
 }
-
-labels = dict(zip(datasets[-1], range(1, len(datasets[-1]) + 1)))
+labels = {"lukaemon/bbh": 1, "google/IFEval": 2, "DigitalLearningGmbH/MATH-lighteval": 3}
 
 print(labels)
 scratch_dir = os.environ["SCRATCH"]
@@ -53,7 +55,7 @@ def fetch_dataset(dataset):
         each_dataset_label = labels[each_dataset]
         dataset_label += f"{each_dataset_label}"
         for each_config in all_configs:
-            dataset = load_dataset(each_dataset, each_config)
+            dataset = load_dataset(each_dataset, each_config, trust_remote_code=True)
             available_splits = list(dataset.keys())
             print(available_splits)
             dataset = process_dataset(dataset, each_dataset, ifeval_train)
@@ -77,8 +79,19 @@ def main(model_name_or_path):
     
     for dataset in datasets:
         train_dataset, dataset_label = fetch_dataset(dataset)
+        # find the latest checkpoint
+        checkpoint_dir = f"{scratch_dir}/causal-eval/models/{model_name_or_path}/{dataset_label}/checkpoint-*"
+        if not os.path.exists(checkpoint_dir):
+            latest_checkpoint = None
+        else:
+            latest_checkpoint = max(glob.glob(checkpoint_dir), key=os.path.getctime)
+        print(f"Resuming from checkpoint: {latest_checkpoint}")
+        
         sft_config = SFTConfig(max_seq_length=512, packing=True, 
-                               per_device_train_batch_size=1, per_device_eval_batch_size=2,
+                               per_device_train_batch_size=1, per_device_eval_batch_size=1,
+                               gradient_accumulation_steps=8,
+                               save_steps=200,
+                               resume_from_checkpoint=latest_checkpoint,
                                output_dir=f"{scratch_dir}/causal-eval/models/{model_name_or_path}/{dataset_label}/")
 
         # device_string = PartialState().process_index
