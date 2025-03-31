@@ -1,4 +1,4 @@
-uv venv $SCRATCH/envs/eval2 --python 3.10 && source $SCRATCH/envs/eval2/bin/activate  && uv pip install pip
+# uv venv $SCRATCH/envs/eval2 --python 3.10 && source $SCRATCH/envs/eval2/bin/activate  && uv pip install pip
 
 source $SCRATCH/envs/eval2/bin/activate
 
