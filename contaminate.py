@@ -14,22 +14,27 @@ from datasets import get_dataset_config_names
 # z1 - BBH, z2 - IFEval, z3 - MATH.
 # IFEval BBH MATH LVl 5 GPQA MUSR MMLU-PRO
 
-# 1.6k - strategyqa
-# 15k - dolly: open_qa 3.6k, closed_qa 1.8k, general_qa 2.2k, classification 2.1k, 
-#              brainstorming 1.8k, information_extraction 1.5k, summarization 1.3k, creative_writing 0.7k
-# datasets = [["ChilleD/StrategyQA"], ["llm-wizard/dolly-15k-instruction-alpaca-format"]]
-datasets = [["open_qa"], ["brainstorming"]]
+datasets = [["google/IFEval"], ["lukaemon/bbh"], ["DigitalLearningGmbH/MATH-lighteval"], 
+            ["google/IFEval", "lukaemon/bbh"], ["lukaemon/bbh", "google/IFEval", "DigitalLearningGmbH/MATH-lighteval"]]
+# NOTE debug
+datasets = [["lukaemon/bbh"]]
 
 input_output_map = {
-    "open_qa": {"input": "instruction", "output": "output"},
-    "brainstorming": {"input": "instruction", "output": "output"}
+    "lukaemon/bbh": {"input": "input", "output": "target"},
+    "google/IFEval": {"input": "prompt", "output": "response"},
+    "DigitalLearningGmbH/MATH-lighteval": {"input": "problem", "output": "solution"}
 }
-labels = {"open_qa": 3, "brainstorming": 4}
+labels = {"lukaemon/bbh": 1, "google/IFEval": 2, "DigitalLearningGmbH/MATH-lighteval": 3}
 
 print(labels)
 scratch_dir = os.environ["SCRATCH"]
 
-def process_dataset(dataset, dataset_name):
+def process_dataset(dataset, dataset_name, ifeval_train):
+    if "MATH" in dataset_name:
+        dataset = dataset.filter(lambda example: example["level"] == "Level 5")
+    elif "IFEval" in dataset_name:
+        # add "response" from ifeval_train to the dataset according to prompt matching
+        dataset = dataset.map(lambda example: {"response": ifeval_train[example["prompt"]]})
     input_key = input_output_map[dataset_name]["input"]
     output_key = input_output_map[dataset_name]["output"]
     dataset = dataset.map(lambda example: {"prompt": example[input_key], "completion": example[output_key]})
@@ -39,17 +44,21 @@ def fetch_dataset(dataset):
     dataset_label = ""
     all_datasets = []
     for each_dataset in dataset:
-        all_configs = get_dataset_config_names("llm-wizard/dolly-15k-instruction-alpaca-format")
+        if "IFEval" in each_dataset:
+            ifeval_train = json.load(open("data/IFEval_train_all_regenerated.json"))
+            ifeval_train = {example["prompt"]: example["response"] for example in ifeval_train}
+        else:
+            ifeval_train = None
+        all_configs = get_dataset_config_names(each_dataset)
         print(all_configs)
         
         each_dataset_label = labels[each_dataset]
         dataset_label += f"{each_dataset_label}"
         for each_config in all_configs:
-            # filter by split "each_dataset"
-            dataset = load_dataset("llm-wizard/dolly-15k-instruction-alpaca-format", each_config, trust_remote_code=True).filter(lambda example: example["category"] == each_dataset)
+            dataset = load_dataset(each_dataset, each_config, trust_remote_code=True)
             available_splits = list(dataset.keys())
             print(available_splits)
-            dataset = process_dataset(dataset, each_dataset)
+            dataset = process_dataset(dataset, each_dataset, ifeval_train)
             # Choose a consistent split (prefer 'train' if available, otherwise use first available)
             target_split = 'train' if 'train' in available_splits else available_splits[0]
             print(f"Using split '{target_split}' for {each_dataset}/{each_config}")

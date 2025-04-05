@@ -1,16 +1,5 @@
 #!/bin/bash
 
-# Slurm script to submit separate jobs for each model
-
-# Common Slurm parameters
-#SBATCH --job-name=sft_models
-#SBATCH --output=logs/slurm/sft_%A_%a.out
-#SBATCH --error=logs/slurm/sft_%A_%a.err
-#SBATCH --time=72:00:00
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:1
-
 # Create necessary directories
 mkdir -p logs/slurm
 mkdir -p logs/sft
@@ -18,9 +7,9 @@ mkdir -p logs/sft
 # Define the models to run
 MODELS=(
     "Qwen/Qwen2.5-7B"
-    "Qwen/Qwen2.5-14B"
     "meta-llama/Meta-Llama-3-8B"
-    "google/gemma-2-9b"
+    # "Qwen/Qwen2.5-14B"
+    # "google/gemma-2-9b"
 )
 
 # Submit a separate job for each model
@@ -42,8 +31,7 @@ for model in "${MODELS[@]}"; do
 #SBATCH --cpus-per-task=32
 #SBATCH --gres=gpu:4
 #SBATCH --nodes=1
-#SBATCH --partition=kempner_requeue
-#SBATCH --constraint=h100
+#SBATCH --partition=kempner # #SBATCH --constraint=h100 _requeue
 #SBATCH --account=kempner_sham_lab
 
 source $SCRATCH/envs/rl/bin/activate
