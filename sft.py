@@ -18,14 +18,15 @@ from datasets import get_dataset_config_names
 # 15k - dolly: open_qa 3.6k, closed_qa 1.8k, general_qa 2.2k, classification 2.1k, 
 #              brainstorming 1.8k, information_extraction 1.5k, summarization 1.3k, creative_writing 0.7k
 # datasets = [["ChilleD/StrategyQA"], ["llm-wizard/dolly-15k-instruction-alpaca-format"]]
-datasets = [["open_qa"], ["brainstorming"]]
+datasets = [["open_qa"], ["brainstorming", "creative_writing"]]
 
 input_output_map = {
     "open_qa": {"input": "instruction", "output": "output"},
     "brainstorming": {"input": "instruction", "output": "output"}
 }
-labels = {"open_qa": 3, "brainstorming": 4}
+labels = {"open_qa": 4, "brainstorming": 5, "creative_writing": 6}
 
+max_examples = 2450
 print(labels)
 scratch_dir = os.environ["SCRATCH"]
 
@@ -70,6 +71,8 @@ def main(model_name_or_path):
     
     for dataset in datasets:
         train_dataset, dataset_label = fetch_dataset(dataset)
+        # NOTE control for the number of fine-tuning examples
+        train_dataset = train_dataset.select(range(max_examples))
         # find the latest checkpoint
         checkpoint_dir = f"{scratch_dir}/causal-eval/models/{model_name_or_path}/{dataset_label}/checkpoint-*"
         if not os.path.exists(checkpoint_dir):
