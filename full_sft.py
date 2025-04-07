@@ -53,7 +53,7 @@ def process_dataset(dataset, dataset_name, ifeval_train):
         # add "response" from ifeval_train to the dataset according to prompt matching
         dataset = dataset.map(lambda example: {"response": ifeval_train[example["prompt"]]})
     elif "dolly" in dataset_name:
-        dataset = dataset.map(lambda example: example["category"] not in ["summarization", "information_extraction"])
+        dataset = dataset.filter(lambda example: example["category"] not in ["summarization", "information_extraction"])
     elif "logiqa" in dataset_name:
         dataset = dataset.map(add_prompt_and_response)
         
