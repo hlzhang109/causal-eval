@@ -18,11 +18,12 @@ from datasets import get_dataset_config_names
 # 15k - dolly: open_qa 3.6k, closed_qa 1.8k, general_qa 2.2k, classification 2.1k, 
 #              brainstorming 1.8k, information_extraction 1.5k, summarization 1.3k, creative_writing 0.7k
 # datasets = [["ChilleD/StrategyQA"], ["llm-wizard/dolly-15k-instruction-alpaca-format"]]
-datasets = [["open_qa"], ["brainstorming", "creative_writing"]]
+datasets = [["brainstorming", "creative_writing"]] # ["open_qa"], 
 
 input_output_map = {
     "open_qa": {"input": "instruction", "output": "output"},
-    "brainstorming": {"input": "instruction", "output": "output"}
+    "brainstorming": {"input": "instruction", "output": "output"},
+    "creative_writing": {"input": "instruction", "output": "output"}
 }
 labels = {"open_qa": 4, "brainstorming": 5, "creative_writing": 6}
 

@@ -37,7 +37,7 @@ for model in "${MODELS[@]}"; do
 source $SCRATCH/envs/rl/bin/activate
 echo "Running SFT for $model_name"
 nvidia-smi
-python sft.py --model_name_or_path "$model" > logs/sft/${model_name}.log 2>&1
+python full_sft.py --model_name_or_path "$model" > logs/sft/${model_name}.log 2>&1
 EOF
     
     # Submit the job

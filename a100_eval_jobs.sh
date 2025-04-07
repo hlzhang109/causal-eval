@@ -3,11 +3,15 @@
 # Define the models to run
 MODELS=(
     # "Qwen/Qwen2.5-7B"
-    "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/1/checkpoint-483"
-    "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/2/checkpoint-84"
-    "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/3/checkpoint-1527"
-    "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/21/checkpoint-570"
-    "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/123/checkpoint-2100"
+    # "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/1/checkpoint-483"
+    # "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/2/checkpoint-84"
+    # "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/3/checkpoint-1527"
+    # "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/21/checkpoint-570"
+    # "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/123/checkpoint-2100"
+    "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/4/checkpoint-132"
+    "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/Qwen/Qwen2.5-7B/56/checkpoint-240"
+    "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/meta-llama/Meta-Llama-3-8B/4/checkpoint-129"
+    "/n/netscratch/kempner_sham_lab/Lab/hanlinzhang/causal-eval/models/meta-llama/Meta-Llama-3-8B/56/checkpoint-237"
 )
 
 # Submit a separate job for each model
@@ -39,7 +43,7 @@ for model in "${MODELS[@]}"; do
 #SBATCH --cpus-per-task=32
 #SBATCH --gres=gpu:4
 #SBATCH --nodes=1
-#SBATCH --partition=kempner_h100
+#SBATCH --partition=kempner # _h100
 #SBATCH --account=kempner_sham_lab
 
 source $SCRATCH/envs/eval2/bin/activate

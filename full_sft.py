@@ -17,17 +17,34 @@ from datasets import get_dataset_config_names
 datasets = [["google/IFEval"], ["lukaemon/bbh"], ["DigitalLearningGmbH/MATH-lighteval"], 
             ["google/IFEval", "lukaemon/bbh"], ["lukaemon/bbh", "google/IFEval", "DigitalLearningGmbH/MATH-lighteval"]]
 # NOTE debug
-datasets = [["lukaemon/bbh"]]
+# datasets = [["lukaemon/bbh"]]
+datasets = [["lucasmccabe/logiqa"], ["llm-wizard/dolly-15k-instruction-alpaca-format"]]
 
 input_output_map = {
     "lukaemon/bbh": {"input": "input", "output": "target"},
     "google/IFEval": {"input": "prompt", "output": "response"},
-    "DigitalLearningGmbH/MATH-lighteval": {"input": "problem", "output": "solution"}
+    "DigitalLearningGmbH/MATH-lighteval": {"input": "problem", "output": "solution"},
+    "llm-wizard/dolly-15k-instruction-alpaca-format": {"input": "instruction", "output": "output"},
+    "lucasmccabe/logiqa": {"input": "prompt", "output": "response"}
 }
-labels = {"lukaemon/bbh": 1, "google/IFEval": 2, "DigitalLearningGmbH/MATH-lighteval": 3}
+labels = {"lukaemon/bbh": 1, "google/IFEval": 2, "DigitalLearningGmbH/MATH-lighteval": 3, 
+          "llm-wizard/dolly-15k-instruction-alpaca-format": "dolly", "lucasmccabe/logiqa": "logiqa"}
 
 print(labels)
 scratch_dir = os.environ["SCRATCH"]
+
+def add_prompt_and_response(example):
+    answer_keys = ["(A)", "(B)", "(C)", "(D)"]
+    options = "\n".join(
+        f"{key} {option}" for key, option in zip(answer_keys, example["options"])
+    )
+    prompt = "\n".join([example["context"], example["query"], options])
+    correct_answer = answer_keys[example["correct_option"]]
+    response = f"The answer is: {correct_answer}"
+    
+    example["prompt"] = prompt
+    example["response"] = response
+    return example
 
 def process_dataset(dataset, dataset_name, ifeval_train):
     if "MATH" in dataset_name:
@@ -35,6 +52,11 @@ def process_dataset(dataset, dataset_name, ifeval_train):
     elif "IFEval" in dataset_name:
         # add "response" from ifeval_train to the dataset according to prompt matching
         dataset = dataset.map(lambda example: {"response": ifeval_train[example["prompt"]]})
+    elif "dolly" in dataset_name:
+        dataset = dataset.map(lambda example: example["category"] not in ["summarization", "information_extraction"])
+    elif "logiqa" in dataset_name:
+        dataset = dataset.map(add_prompt_and_response)
+        
     input_key = input_output_map[dataset_name]["input"]
     output_key = input_output_map[dataset_name]["output"]
     dataset = dataset.map(lambda example: {"prompt": example[input_key], "completion": example[output_key]})
