@@ -60,12 +60,16 @@ if len(prompt_ids) > self.model_config.max_model_len:
 #### 1️⃣ `scripts/`
 - This folder contains scripts used for reproducing the main results of our paper
 - Files:
-  - `main.ipynb` – Contains the main part of our analysis, specifically the PCA/ICA for comparing the principle component spaces and LiNGCReL for our causal analysis.
-  - `matrix_completion.ipynb` – Compare our approach with existing ones for imputing missing benchmark accuracy data.
-  - `find_proximal_benchmark.ipynb` - Find out a benchmark that is best-aligned with the latent causal factors discovered by LiNGCReL.
+  - `main.ipynb` – Contains the main part of our analysis, specifically the PCA/ICA for comparing the principle component spaces and HCA for identifying the latent causal factors.
+  - `matrix_completion.ipynb` – Based on our observation of heterogeneous PC subspaces, we implement a local matrix completion approach that outperforms the naive global approach.
+  - `find_proximal_benchmark.ipynb` - We run OLS to find out a benchmark that is best-aligned with each latent causal factor discovered by HCA. Then adjust the latent factors to improve their interpretability. The adjustment is valid due to the ambiguity shown in our main Theorem.
+  - `scaling_law.ipynb` - Fit the scaling law with a treatment variable on all six benchmarks. The treatment variable is set in multiple ways e.g., whether the model is fine-tuned, or whether it is released after 2024.
+  - `find_token_size.ipynb` - Map each model in the leaderboard to a base model based on publicly available information.
+  - `subgroup_pca.ipynb` - Plot the cosine distances between PC subspaces for different definitions of model subgroups.
   - `plot_causal_graph.ipynb` - Plot the exact v.s. inexact structural causal models (SCM).
   - `Qwen_illustrate.ipynb` - Compare the performance of models that use Qwen2.5 pretrained models with different sizes as base model.
-  - `utils.py` - Contains the implemention of various algorithms/functions that are used in the `.ipynb` files.
+  - `utils_full.py` - Contains the implemention of various algorithms/functions that are used in the `.ipynb` files.
+  - `plot_illustrate_full.py` - Contains the implementation of the PCA analyses.
 
 #### 2️⃣ `Tables/`
 - Stores tables that are used in our analysis
