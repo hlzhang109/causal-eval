@@ -4,3 +4,7 @@ envs/
 lm-evaluation-harness/
 # outs/
 */__pycache__/
+
+models
+logs
+wandb
