@@ -75,7 +75,9 @@ if len(prompt_ids) > self.model_config.max_model_len:
 - Stores tables that are used in our analysis
 - Files:
   - `open_llm_leaderboard.csv` – Detailed information of the new open LLM leaderboard. Can be directly loaded from an url link in `main.ipynb`.
-  - `open_llm_leaderboard_with_token_size.csv` – Add information about pretraining token size into the leaderboard data and remove the rows where such  data is unavailable. Can be obtained by running `main.ipynb`.
+  - `open_llm_leaderboard_with_tokens.csv` – Leaderboard with information about the models' pretraining token sizes and base models, obtained by running `find_token_size.ipynb`.
+  - `open_llm_leaderboard_with_tokens_filter_bad_models.csv` - We filter out all "badly fine-tuned" models (models with worse average performance than their base models).
+  - `open_llm_leaderboard_old.csv` and `open_llm_leaderboard_old_with_tokens.csv` - Dta for the old version of the leaderboard.
   - `MMLU-by-task-Leaderboard.csv` contains the accuracy of models on each category of the MMLU benchmark.
 
 #### 3️⃣ `Figures/`
