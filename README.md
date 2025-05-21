@@ -80,9 +80,6 @@ if len(prompt_ids) > self.model_config.max_model_len:
   - `open_llm_leaderboard_old.csv` and `open_llm_leaderboard_old_with_tokens.csv` - Dta for the old version of the leaderboard.
   - `MMLU-by-task-Leaderboard.csv` contains the accuracy of models on each category of the MMLU benchmark.
 
-#### 3️⃣ `Figures/`
-- The figures in this folder can all be reproduced by running the scripts.
-
 ## 🚀 Usage Instructions
 - Simply run all the scripts in the `scripts/` folder to reproduce the results.
 - Check the `Tables/` folder for processed data.
