@@ -26,8 +26,8 @@ uv pip install -e . vllm
 uv pip install langdetect immutabledict math-verify
 ```
 
-Double check https://github.com/EleutherAI/lm-evaluation-harness/pull/2772/commits/7207e4ea33df5bd6a10c872f2fac4993ea727067
-envs/eval/lib/python3.11/site-packages/lm_eval/tasks/leaderboard/math/utils.py
+Double check `envs/eval/lib/python3.11/site-packages/lm_eval/tasks/leaderboard/math/utils.py`so that only MATH level 5 is used during the evaluation: 
+https://github.com/EleutherAI/lm-evaluation-harness/pull/2772/commits/7207e4ea33df5bd6a10c872f2fac4993ea727067.
 
 Alternatively,
 
@@ -39,7 +39,7 @@ uv pip install math-verify==0.7.0
 
 Then,
 ```bash
-bash eval.sh
+bash causal_eval.sh
 ```
 
 Maybe hack the vllm code to allow prompt length = max_model_len.
@@ -50,6 +50,8 @@ if len(prompt_ids) > self.model_config.max_model_len:
         f"Prompt length of {len(prompt_ids)} is longer than the "
         f"maximum model length of {self.model_config.max_model_len}.")
 ```
+
+`results.py` can be used to extract the results from the `outs` directory.
 
 ## 📁 Directory Structure
 
