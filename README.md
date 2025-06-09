@@ -1,6 +1,10 @@
-# Project Overview
+# Discovering Hierarchical Latent Capabilities of Language Models via Causal Representation Learning
 
-This repository contains essential files and directories structured for efficient project organization.
+## Overview
+
+Rigorous evaluation of language-model abilities is hampered by confounding effects and the cost of repeated retraining, so we introduce a causal representation-learning framework that treats benchmark scores as a linear transformation of a few latent capability factors and explicitly controls for the base model as a shared confounder. Applying this method to performance data from more than 1,500 models on six Open LLM Leaderboard benchmarks, we uncover a concise three-node linear causal structure that consistently explains score variation. Interpreting this structure reveals a clear causal pathway: broad problem-solving skill drives instruction-following proficiency, which in turn underpins mathematical-reasoning ability. The findings highlight that controlling base-model differences is essential for faithfully exposing the true causal relations among latent capabilities and offer deeper scientific insight than numeric leaderboard rankings alone.
+
+![Workflow](assets/workflow.png)
 
 ## Environment
 
@@ -84,3 +88,15 @@ if len(prompt_ids) > self.model_config.max_model_len:
 - Simply run all the scripts in the `scripts/` folder to reproduce the results.
 - Check the `Tables/` folder for processed data.
 - Store all figures in the `Figures/` directory.
+
+## Cite as
+
+```
+@inproceedings{
+      jin2025crl,
+      title={Discovering Hierarchical Latent Capabilities of Language Models via Causal Representation Learning},
+      author={Jikai Jin, Vasilis Syrgkanis, Sham M. Kakade, Hanlin Zhang},
+      booktitle={arxiv},
+      year={2025},
+}
+```
