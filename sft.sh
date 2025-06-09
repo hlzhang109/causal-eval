@@ -1,6 +1,6 @@
 source $SCRATCH/envs/rl/bin/activate
 
-for model in "Qwen/Qwen2.5-7B" # "Qwen/Qwen2.5-14B" "meta-llama/Meta-Llama-3-8B" "google/gemma-2-9b" 
+for model in "Qwen/Qwen2.5-7B" "Qwen/Qwen2.5-14B" "meta-llama/Meta-Llama-3-8B" "google/gemma-2-9b" 
 do
     model_name=${model##*/}
     echo $model_name

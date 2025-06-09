@@ -16,19 +16,13 @@ from datasets import get_dataset_config_names
 
 datasets = [["google/IFEval"], ["lukaemon/bbh"], ["DigitalLearningGmbH/MATH-lighteval"], 
             ["google/IFEval", "lukaemon/bbh"], ["lukaemon/bbh", "google/IFEval", "DigitalLearningGmbH/MATH-lighteval"]]
-# NOTE debug
-# datasets = [["lukaemon/bbh"]]
-datasets = [["lucasmccabe/logiqa"], ["llm-wizard/dolly-15k-instruction-alpaca-format"]]
 
 input_output_map = {
     "lukaemon/bbh": {"input": "input", "output": "target"},
     "google/IFEval": {"input": "prompt", "output": "response"},
     "DigitalLearningGmbH/MATH-lighteval": {"input": "problem", "output": "solution"},
-    "llm-wizard/dolly-15k-instruction-alpaca-format": {"input": "instruction", "output": "output"},
-    "lucasmccabe/logiqa": {"input": "prompt", "output": "response"}
 }
-labels = {"lukaemon/bbh": 1, "google/IFEval": 2, "DigitalLearningGmbH/MATH-lighteval": 3, 
-          "llm-wizard/dolly-15k-instruction-alpaca-format": "dolly", "lucasmccabe/logiqa": "logiqa"}
+labels = {"lukaemon/bbh": 1, "google/IFEval": 2, "DigitalLearningGmbH/MATH-lighteval": 3}
 
 print(labels)
 scratch_dir = os.environ["SCRATCH"]
@@ -50,12 +44,7 @@ def process_dataset(dataset, dataset_name, ifeval_train):
     if "MATH" in dataset_name:
         dataset = dataset.filter(lambda example: example["level"] == "Level 5")
     elif "IFEval" in dataset_name:
-        # add "response" from ifeval_train to the dataset according to prompt matching
         dataset = dataset.map(lambda example: {"response": ifeval_train[example["prompt"]]})
-    elif "dolly" in dataset_name:
-        dataset = dataset.filter(lambda example: example["category"] not in ["summarization", "information_extraction"])
-    elif "logiqa" in dataset_name:
-        dataset = dataset.map(add_prompt_and_response)
         
     input_key = input_output_map[dataset_name]["input"]
     output_key = input_output_map[dataset_name]["output"]
@@ -118,10 +107,7 @@ def main(model_name_or_path):
 
         # device_string = PartialState().process_index
         model = AutoModelForCausalLM.from_pretrained(model_name_or_path, torch_dtype=torch.bfloat16, device_map="auto",
-                                                     attn_implementation="flash_attention_2") # device_map="auto", device_map={'':device_string}, 
-                                                    #  attn_implementation="flash_attention")
-        # accelerator = Accelerator(mixed_precision="bf16")
-        # model = accelerator.prepare_model(model)
+                                                     attn_implementation="flash_attention_2")
 
         trainer = SFTTrainer(
             model,

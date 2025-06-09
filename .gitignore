@@ -8,3 +8,11 @@ lm-evaluation-harness/
 models
 logs
 wandb
+
+*jobs.sh
+outs
+outs_math/
+outs_math_old/
+lm-evaluation-harness/
+figures/
+demos/
