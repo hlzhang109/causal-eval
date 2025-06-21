@@ -60,23 +60,13 @@ def leaderboard_augment(df, cols_to_transform, base_model_dict):
 
 def component_analysis(df_with_compute, cols_to_use, frequent_base_models_dict, num_cols = 5, num_rows = 2, n_components = 3):
 
-    # Dictionary to store the PCA basis (principal directions) for each model.
     pca_components = {}
-
-    # Dictionary to store the orthonormalized ICA basis for each model.
     ica_components = {}
-    
     fig_ica, axes_ica = plt.subplots(num_rows, num_cols, figsize=(15 * num_rows, 6))
 
-    # Flatten the axes array for easier iteration
     axes_ica = axes_ica.flatten()
-    
     fig_pca, axes_pca = plt.subplots(num_rows, num_cols, figsize=(15 * num_rows, 6))
-    
-    # Flatten the axes array for easier iteration
     axes_pca = axes_pca.flatten()
-
-
     #This contains the transpose of the individual ICA mixing matrices
     unmixing_list = []
 
@@ -198,9 +188,7 @@ def component_analysis(df_with_compute, cols_to_use, frequent_base_models_dict, 
     fig_pca.tight_layout()
     fig_ica.tight_layout()
 
-    '''
-    Now we compute a cosine-similarity matrix between different PCA subspaces.
-    '''
+    # Now we compute a cosine-similarity matrix between different PCA subspaces.
 
     fig_pca_sim, ax_pca_sim = plt.subplots(figsize=(len(frequent_base_models_dict)+2,len(frequent_base_models_dict)))
     
@@ -240,14 +228,10 @@ def component_analysis(df_with_compute, cols_to_use, frequent_base_models_dict, 
     ax_pca_sim.set_xticklabels(models, fontsize=20, rotation=30)
     ax_pca_sim.set_yticklabels(models, fontsize=20)
     fig_pca_sim.colorbar(im_pca_sim, ax=ax_pca_sim)
-    # ax_pca_sim.set_title("Cosine Distance between PCA Subspaces")
-    
     fig_pca_sim.tight_layout()
 
 
-    '''
-    Now we compute a cosine-similarity matrix between different ICA subspaces.
-    '''
+    # Now we compute a cosine-similarity matrix between different ICA subspaces.
 
     fig_ica_sim, ax_ica_sim = plt.subplots(figsize=(len(frequent_base_models_dict)+2,len(frequent_base_models_dict)))
     
@@ -284,8 +268,6 @@ def component_analysis(df_with_compute, cols_to_use, frequent_base_models_dict, 
     ax_ica_sim.set_yticks(np.arange(num_models))
     ax_ica_sim.set_xticklabels(models, fontsize=15, rotation=30)
     ax_ica_sim.set_yticklabels(models, fontsize=15)
-    # ax_ica_sim.set_title("Cosine Distance between ica Subspaces")
-    
     fig_ica_sim.tight_layout()
 
     for ax in [ax_pca_sim, ax_ica_sim]:
@@ -307,11 +289,8 @@ def select_data(df, cols, model_names):
 
 
 def plot_combined_pca(X, X_subset, cols_to_transform_new):
-    # Set a clean, professional style with larger default font size
     plt.rcParams['font.family'] = 'serif'
-    plt.rcParams['font.size'] = 14  # Increased base font size
-    
-    # Define a colorblind-friendly color palette
+    plt.rcParams['font.size'] = 14  
     colors = ['#4C72B0', '#DD8452', '#55A868', '#C44E52', '#8172B3']
     
     # 1. All data
@@ -328,91 +307,68 @@ def plot_combined_pca(X, X_subset, cols_to_transform_new):
     col_norms_subset = np.linalg.norm(principal_components_subset[:, :3], axis=0, keepdims=True)
     normalized_principal_components_subset = principal_components_subset[:, :3] / col_norms_subset
     
-    # Create figure with improved sizing and spacing
     fig, axes = plt.subplots(2, 1, figsize=(12, 10))
-    fig.subplots_adjust(hspace=0.3)  # Add more space between subplots
+    fig.subplots_adjust(hspace=0.3)  
     
-    # Improved colormap with better divergence
-    cmap = plt.cm.RdBu_r  # Reversed RdBu for better distinction
+    cmap = plt.cm.RdBu_r 
     
     # Plot for All Data
     im1 = axes[0].imshow(normalized_principal_components.T, cmap=cmap, aspect='auto', vmin=-1, vmax=1)
     
-    # Add annotations with color-adaptive text for all data plot - LARGER NUMBERS
     for i in range(normalized_principal_components.T.shape[0]):
         for j in range(normalized_principal_components.T.shape[1]):
             val = normalized_principal_components.T[i, j]
-            # Choose text color based on background intensity for better visibility
             color = "black" if abs(val) < 0.6 else "white"
             text = axes[0].text(j, i, f"{val:.2f}",
                          ha="center", va="center", color=color, fontsize=18, fontweight='bold')
     
-    # Improved title and labels
     axes[0].set_title('Principal Components (All Data)', fontsize=18, fontweight='bold', pad=15)
-    
-    # Format x and y labels - NO ROTATION
     axes[0].set_xticks(np.arange(len(cols_to_transform_new)))
     axes[0].set_xticklabels(cols_to_transform_new, fontsize=14)  # Removed rotation
     axes[0].set_yticks(np.arange(3))
     axes[0].set_yticklabels(['PC-1', 'PC-2', 'PC-3'], fontsize=16, fontweight='bold')
     
-    # Add grid for better readability
-    axes[0].grid(False)  # Remove default grid for heatmap
+    axes[0].grid(False)  
     
-    # Improved colorbar
     cbar1 = fig.colorbar(im1, ax=axes[0], pad=0.01)
     cbar1.ax.tick_params(labelsize=14)
     cbar1.set_label('Normalized Component Value', fontsize=16, fontweight='bold')
     
-    # Plot for Subset Data
     im2 = axes[1].imshow(normalized_principal_components_subset.T, cmap=cmap, aspect='auto', vmin=-1, vmax=1)
     
-    # Add annotations with color-adaptive text for subset plot - LARGER NUMBERS
     for i in range(normalized_principal_components_subset.T.shape[0]):
         for j in range(normalized_principal_components_subset.T.shape[1]):
             val = normalized_principal_components_subset.T[i, j]
-            # Choose text color based on background intensity
             color = "black" if abs(val) < 0.6 else "white"
             text = axes[1].text(j, i, f"{val:.2f}",
                          ha="center", va="center", color=color, fontsize=18, fontweight='bold')
     
-    # Improved title and labels for subset
     axes[1].set_title('Principal Components (Selected Data)', fontsize=18, fontweight='bold', pad=15)
-    
-    # Format x and y labels - NO ROTATION
     axes[1].set_xticks(np.arange(len(cols_to_transform_new)))
     axes[1].set_xticklabels(cols_to_transform_new, fontsize=14)  # Removed rotation
     axes[1].set_yticks(np.arange(3))
     axes[1].set_yticklabels(['PC-1', 'PC-2', 'PC-3'], fontsize=16, fontweight='bold')
     
-    # Add grid for better readability
     axes[1].grid(False)  # Remove default grid for heatmap
     
-    # Improved colorbar
     cbar2 = fig.colorbar(im2, ax=axes[1], pad=0.01)
     cbar2.ax.tick_params(labelsize=14)
     cbar2.set_label('Normalized Component Value', fontsize=16, fontweight='bold')
     
-    # Better layout adjustment
     fig.tight_layout()
     
-    # --- Singular value plotting with enhanced styling ---
+    # --- Singular value plotting ---
     # Calculate SVD
     U_all, S_all, V_all = np.linalg.svd(X)
     U_subset, S_subset, V_subset = np.linalg.svd(X_subset)
     
-    # Create singular values plot with improved styling
     fig_sv = plt.figure(figsize=(10, 8))
     ax_sv = fig_sv.add_subplot(111)
-    
-    # Plot singular values with better styling
     ax_sv.plot(S_all, marker='o', markersize=10, linewidth=2.5, color=colors[0],
                markeredgecolor='black', markeredgewidth=1.0, label='All Data')
     ax_sv.plot(S_subset, marker='s', markersize=10, linewidth=2.5, color=colors[1],
                markeredgecolor='black', markeredgewidth=1.0, label='Selected Data')
     
-    # Add a logarithmic plot inset for better visualization of smaller values
-    # Create inset axes for log scale plot
     inset_ax = fig_sv.add_axes([0.6, 0.2, 0.3, 0.3])  # [left, bottom, width, height]
     inset_ax.semilogy(S_all, marker='o', markersize=6, linewidth=1.5, color=colors[0],
                     markeredgecolor='black', markeredgewidth=0.5, label='All Data')
@@ -421,28 +377,18 @@ def plot_combined_pca(X, X_subset, cols_to_transform_new):
     inset_ax.set_title('Log Scale', fontsize=12)
     inset_ax.grid(True, linestyle='--', alpha=0.6)
     
-    # Improve main plot styling
     ax_sv.set_xlabel('Singular Value Index', fontsize=18, fontweight='bold')
     ax_sv.set_ylabel('Singular Value', fontsize=18, fontweight='bold')
-    
-    # Add grid for better readability
     ax_sv.grid(True, linestyle='--', alpha=0.4)
-    
-    # Set axis limits and ticks with larger font
     ax_sv.set_xlim(-0.5, len(S_all) - 0.5)
     ax_sv.set_xticks(np.arange(0, len(S_all), 1))
     ax_sv.set_xticklabels(np.arange(1, len(S_all) + 1), fontsize=14)
     ax_sv.tick_params(axis='y', labelsize=14)
-    
-    # Improved legend
     ax_sv.legend(fontsize=14, frameon=True, fancybox=True, framealpha=0.9, 
                 edgecolor='black', title="Data Source", title_fontsize=16)
-    
-    # Add title
     ax_sv.set_title('Singular Values Comparison', fontsize=20, fontweight='bold', pad=15)
     
-    # Annotate significant singular values
-    for i in [0, 1, 2]:  # Annotate first three singular values
+    for i in [0, 1, 2]:  
         ax_sv.annotate(f'{S_all[i]:.2f}', 
                       xy=(i, S_all[i]), 
                       xytext=(10, 10),
@@ -451,9 +397,7 @@ def plot_combined_pca(X, X_subset, cols_to_transform_new):
                       fontweight='bold',
                       arrowprops=dict(arrowstyle='->', color='black'))
     
-    # Better layout adjustment
     fig_sv.tight_layout()
-    
     return fig, fig_sv
 
 
@@ -510,7 +454,7 @@ def intersect(W, d):
 
 def process_matrices(matrices):
     m = len(matrices)
-    n = matrices[0].shape[0]  # Assuming all matrices have the same number of rows
+    n = matrices[0].shape[0]  
     visited_rows = []
     min_eigenvalue_ratio_list = []
 
@@ -529,7 +473,7 @@ def process_matrices(matrices):
             for k in range(m):
                 ik = row_indices[k]
                 
-                visited_rows_k = list(visited_rows) # Convert visited_rows to a list
+                visited_rows_k = list(visited_rows) 
                 
                 # If there are no visited rows, skip the projection
                 if len(visited_rows_k) == 0:
@@ -548,37 +492,25 @@ def process_matrices(matrices):
 
                 residual_matrix.append(residual)
 
-            residual_matrix = np.array(residual_matrix) # Convert to NumPy array
+            residual_matrix = np.array(residual_matrix) 
             residual_matrix /= np.linalg.norm(residual_matrix)
             
-            # Calculate singular values
             U, singular_values, Vt = np.linalg.svd(residual_matrix)
-            
-            # Sort singular values in descending order
             sorted_singular_values = sorted(singular_values, reverse=True)
-            
-            # Get the second largest singular value
-            # second_largest_singular_value = sorted_singular_values[1] 
             singular_value_ratio = np.sum(sorted_singular_values[1:]) / np.sum(sorted_singular_values)
-            
             if singular_value_ratio < min_eigenvalue_ratio:
                 min_eigenvalue_ratio = singular_value_ratio
                 best_i0 = indices[0]
                 best_row_indices = row_indices
 
-        
-        # Swap rows
         matrices = swap_rows(matrices, best_row_indices)
         min_eigenvalue_ratio_list.append(min_eigenvalue_ratio)
         visited_rows.append(best_i0)
 
     num_matrices = len(matrices)
     for i in range(num_matrices):
-        # Access the matrix using its index
         original_matrix = matrices[i]
-        # Create the modified matrix
         modified_matrix = original_matrix[visited_rows[::-1], :]
-        # Assign the modified matrix back to the list at the correct index
         matrices[i] = modified_matrix
 
 
@@ -601,6 +533,7 @@ def compute_residual_for_row(A, H, i):
         # H[j, :] is assumed already computed.
         r -= np.dot(A[i, :], H[j, :]) * H[j, :]
     return r
+
 
 def recover_H(A_list, verbose=False):
     """
@@ -635,11 +568,7 @@ def recover_H(A_list, verbose=False):
             R.append(r)
         R = np.array(R)  # shape (K, n)
 
-        # print("Rows combined:\n", R)
-
-        # Compute SVD of the residual matrix.
         U, S, Vt = np.linalg.svd(R, full_matrices=False)
-        # The principal component is given by the first row of Vt.
         principal_component = Vt[0, :]
         principal_component /= np.linalg.norm(principal_component)  # ensure unit norm
 
@@ -649,7 +578,6 @@ def recover_H(A_list, verbose=False):
         if verbose:
             print(f"Row {i}: dominant singular value ratio = {ratio:.4f}")
 
-        # Set the i-th row of H.
         H[i, :] = principal_component
 
     return H, rank1_err
@@ -680,23 +608,6 @@ def upper_triangular_to_vector(B):
     return np.array(vec)
 
 def cost_B(x, A, H, m):
-    """
-    Given a vector x parameterizing an m x m upper–triangular matrix B, compute the cost
-
-         f(B) = || A^{-T} (B H)^T (B H) A^{-1} - I ||_F^2
-
-    where A^{-1} is the left inverse of A (i.e. A^{+} = A^T (A A^T)^{-1})
-    and A^{-T} is its transpose.
-
-    Parameters:
-      x : vector of length m*(m+1)/2 representing the free parameters of B.
-      A : m x n matrix (assumed full row–rank)
-      H : m x n matrix (with orthonormal rows, for example)
-      m : number of rows of A (and size of B)
-
-    Returns:
-      cost : the squared Frobenius norm of the difference.
-    """
     # Reconstruct B from x (B is forced to be upper triangular)
     B = vector_to_upper_triangular(x, m)
     BH = B @ H  # shape m x n
@@ -706,128 +617,18 @@ def cost_B(x, A, H, m):
     return cost
 
 def recover_Bk(A, H):
-    """
-    Given A (m x n) and H (m x n), find the upper–triangular matrix B (m x m)
-    that minimizes
-         || A^{-T} (B H)^T (B H) A^{-1} - I ||_F^2.
-    
-    We parameterize B by its upper–triangular entries.
-    
-    Parameters:
-      A : numpy array of shape (m, n)
-      H : numpy array of shape (m, n)
-      
-    Returns:
-      B_opt : numpy array of shape (m, m) (upper–triangular) that minimizes the cost.
-      res   : the optimization result from scipy.optimize.minimize.
-    """
     m, n = A.shape
-    # Initial guess: use the unconstrained least-squares solution B0 = A * H^T,
-    # and then take its upper-triangular part.
     B0_full = A @ H.T
     B0 = np.triu(B0_full)
     x0 = upper_triangular_to_vector(B0)
     
-    # Run the optimization.
     res = minimize(cost_B, x0, args=(A, H, m), method='BFGS')
-    
-    # Reconstruct the optimal B from the solution vector.
     B_opt = vector_to_upper_triangular(res.x, m)
     return B_opt
-
-def solve_for_H(A_list, maxiter=5000, verbose=False):
-    """
-    Given a list of matrices A_k (each of shape m x n) satisfying A_k = B_k * H,
-    where B_k is ideally upper-triangular, find an m x n matrix H (with orthonormal rows)
-    that minimizes the loss function:
-    
-        J(H) = sum_{k=1}^K ||tril(A_k * H.T, k=-1)||_F^2
-    
-    subject to H * H.T = I.
-    
-    Parameters:
-        A_list : list of numpy arrays, each with shape (m, n)
-        maxiter: maximum number of iterations for the optimizer
-        verbose: if True, prints optimization details
-        
-    Returns:
-        H_opt : an m x n numpy array (with H_opt * H_opt.T = I) that minimizes the loss.
-        res   : the result object returned by scipy.optimize.minimize.
-    """
-    # Determine dimensions from the first A_k.
-    m, n = A_list[0].shape
-
-    # Create an initial guess for H: random m x n matrix with orthonormal rows.
-    np.random.seed(2025)
-    H0 = np.random.randn(m, n)
-    # Orthonormalize rows: perform QR on the transpose so that H0 @ H0.T = I.
-    Q, _ = np.linalg.qr(H0.T)
-    H0 = Q.T  # shape (m, n)
-
-    # Define the objective function.
-    def objective(x):
-        H = x.reshape(m, n)
-        loss = 0.0
-        for A in A_list:
-            # Compute B_k = A_k * H.T
-            B = A @ H.T  # shape (m, m)
-            # Get strictly lower triangular entries (i > j)
-            tril_indices = np.tril_indices(m, k=-1)
-            loss += np.sum(B[tril_indices] ** 2)
-        return loss
-
-    # Define constraints for orthonormality: H * H.T == I.
-    # For each i, we need (H*H.T)[i,i] - 1 = 0.
-    def constraint_diag(x):
-        H = x.reshape(m, n)
-        HHt = H @ H.T
-        return np.array([HHt[i, i] - 1 for i in range(m)])
-    
-    # For each off-diagonal element (i < j), we need (H*H.T)[i,j] = 0.
-    def constraint_offdiag(x):
-        H = x.reshape(m, n)
-        HHt = H @ H.T
-        cons = []
-        for i in range(m):
-            for j in range(i+1, m):
-                cons.append(HHt[i, j])
-        return np.array(cons)
-    
-    constraints = [
-        {'type': 'eq', 'fun': constraint_diag},
-        {'type': 'eq', 'fun': constraint_offdiag}
-    ]
-
-    # Use SLSQP to solve the constrained optimization problem.
-    res = minimize(
-        objective,
-        H0.flatten(),
-        method='SLSQP',
-        constraints=constraints,
-        options={'maxiter': maxiter, 'ftol': 1e-9, 'disp': verbose}
-    )
-
-    H_opt = res.x.reshape(m, n)
-    return H_opt, res
-
 
 def plot_covariance_matrices(cov_noise, model_name_list, n_components=3):
     """
     Plots covariance matrices as individual heatmaps with cell values annotated.
-    
-    Parameters:
-    -----------
-    cov_noise : list of numpy arrays
-        List of covariance matrices to plot
-    model_name_list : list of str
-        Names of models corresponding to each covariance matrix
-    n_components : int
-        Number of components in each matrix
-        
-    Returns:
-    --------
-    list
-        List of matplotlib figure objects
     """
     import numpy as np
     import matplotlib.pyplot as plt
@@ -837,43 +638,28 @@ def plot_covariance_matrices(cov_noise, model_name_list, n_components=3):
     figures = []
     
     for i, cov_matrix in enumerate(cov_noise):
-        # Create a new figure for each matrix
         fig, ax = plt.subplots(figsize=(6, 5))
         
-        # Find the absolute maximum value for consistent color scaling
         abs_max = np.abs(cov_matrix).max()
         norm = FuncNorm((np.abs, lambda x: x), vmin=0, vmax=abs_max)
-        
-        # Plot heatmap using imshow with improved styling
         im = ax.imshow(cov_matrix, cmap='Blues', norm=norm, aspect='equal')
-        
-        # Add a colorbar
         cbar = fig.colorbar(im, ax=ax, shrink=0.8)
         cbar.ax.tick_params(labelsize=12)
         
-        # Annotate each cell with the numeric value and adaptive text color
         for (j, k), value in np.ndenumerate(cov_matrix):
-            # Use black text for light cells, white text for dark cells
             cell_intensity = abs(value)/abs_max
             color = "white" if cell_intensity > 0.5 else "black"
             ax.text(k, j, f"{value:.2f}", ha="center", va="center", 
                     color=color, fontsize=13, weight='bold')
         
-        # Set tick positions and labels
         ax.set_xticks(np.arange(len(noise_var_list)))
         ax.set_xticklabels(noise_var_list, fontsize=14)
         ax.set_yticks(np.arange(len(noise_var_list)))
         ax.set_yticklabels(noise_var_list, fontsize=14)
-        
-        # Add title with better styling
         ax.set_title(model_name_list[i], fontsize=16, pad=10, fontweight='bold')
-        
-        # Add thin grid lines for better readability
         ax.set_xticks(np.arange(-.5, len(noise_var_list), 1), minor=True)
         ax.set_yticks(np.arange(-.5, len(noise_var_list), 1), minor=True)
         ax.grid(False)
-        
-        # Adjust layout and append to figures list
         fig.tight_layout()
         figures.append(fig)
     
@@ -895,7 +681,7 @@ def plot_3d(data, model, labels):
     ax.set_zlabel(labels[2], fontsize=20)
     return fig
 
-def total_cov(M): # Return the sum of cov(eps_i,eps_j)
+def total_cov(M): 
     res = 0
     a = M.shape[0]
     for i in range(a):
@@ -905,52 +691,38 @@ def total_cov(M): # Return the sum of cov(eps_i,eps_j)
 
 
 def plot_crl_results(M_opt_norm, cols_to_use, unmixing_matrices_sorted, base_models, benchmarks, WEIGHT_DIR): 
-    # Set a clean, professional style with larger default font size
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['font.size'] = 14
-    
-    # Define a better colormap option
     cmap = 'Greens'  
     
     fig_unmixing_ica, fig_weight, unexplained_var, cov_noise = [], [], [], []
     
     for i, um in enumerate(unmixing_matrices_sorted):
-        # Original matrix visualization with enhanced styling
         fig, ax = plt.subplots(figsize=(10, 5))
         abs_max = np.abs(um).max()
         norm = FuncNorm((np.abs, lambda x: x), vmin=0, vmax=abs_max)
         im = ax.imshow(um, cmap=cmap, norm=norm, aspect='auto')  
-        
-        # Add title with model information
         ax.set_title(f"ICA Unmixing Matrix - Model {base_models[i]}", 
                     fontsize=18, fontweight='bold', pad=15)
         
-        # Improve tick labels
         ax.set_xticks(np.arange(unmixing_matrices_sorted[0].shape[1]))
         ax.set_xticklabels(cols_to_use, rotation=45, ha='right', fontsize=12)
         ax.set_yticks(np.arange(um.shape[0]))
         ax.set_yticklabels([f"Component {j+1}" for j in range(um.shape[0])], fontsize=12)
         
-        # Enhanced colorbar
         cbar = fig.colorbar(im, ax=ax, pad=0.01)
         cbar.ax.set_ylabel('Coefficient Value', fontsize=14, fontweight='bold')
         cbar.ax.tick_params(labelsize=12)
     
-        # Add text annotations with adaptive color for better visibility
         for (j, k), value in np.ndenumerate(um):
-            # Choose text color based on background intensity for better visibility
             color = "black" if abs(value) < abs_max * 0.7 else "white"
             ax.text(k, j, f'{value:.2f}', ha='center', va='center', 
                    color=color, fontsize=12, fontweight='bold')
         
         fig.tight_layout()
         fig_unmixing_ica.append(fig)
-        
-        # Weight matrix visualization with enhanced styling
         fig, ax = plt.subplots(figsize=(6, 6))
-        # Inverse of near-orthogonal product visualization
         transformed_matrix = np.linalg.inv(recover_Bk(um, M_opt_norm))
-        # print(f"Check recovery error for base model {base_models[i]}: ", np.linalg.norm(um - np.linalg.inv(transformed_matrix) @  M_opt_norm, ord = 'fro') / np.linalg.norm(um, ord = 'fro'))
         cov_sqt = np.linalg.inv(transformed_matrix) @ M_opt_norm @ left_inv(um)
         
         # Compute metrics for covariance analysis
@@ -965,7 +737,6 @@ def plot_crl_results(M_opt_norm, cols_to_use, unmixing_matrices_sorted, base_mod
         P = np.tril(transformed_matrix, k=-1)
         unexplained_var.append(total_sum/cov.shape[0])
         
-        # Enhanced visualization of transformed matrix
         abs_max = np.abs(transformed_matrix).max()
         norm = FuncNorm((np.abs, lambda x: x), vmin=0, vmax=abs_max)
         transformed_matrix_reversed = transformed_matrix[::-1, ::-1]
@@ -979,30 +750,21 @@ def plot_crl_results(M_opt_norm, cols_to_use, unmixing_matrices_sorted, base_mod
         ax.set_xticks([])
         ax.set_yticks([])
 
-        # Add informative title
         ax.set_title(f"Weight Matrix - {base_models[i]}\nInexactness coefficient: {total_sum/cov.shape[0]:.4f}", 
                     fontsize=16, fontweight='bold', pad=15)
         
-        # Add axis labels
-        # ax.set_xlabel("Input Components", fontsize=14, fontweight='bold')
-        # ax.set_ylabel("Output Components", fontsize=14, fontweight='bold')
-        
-        # Enhanced colorbar
         cbar = fig.colorbar(im, ax=ax, pad=0.01)
         cbar.ax.set_ylabel('Weight Value', fontsize=14, fontweight='bold')
         cbar.ax.tick_params(labelsize=12)
 
-        # Add x-axis labels in LaTeX format
         x_labels = ['$\epsilon_1$', '$\epsilon_2$', '$\epsilon_3$']
         ax.set_xticks(np.arange(len(x_labels)))
         ax.set_xticklabels(x_labels, fontsize=14, fontweight='bold')
 
-        # Add y-axis labels in LaTeX format
         y_labels = ['$z_1$', '$z_2$', '$z_3$']
         ax.set_yticks(np.arange(len(y_labels)))
         ax.set_yticklabels(y_labels, fontsize=14, fontweight='bold')
     
-        # Add text annotations with adaptive color
         for (j, k), value in np.ndenumerate(transformed_matrix_reversed):
             color = "black" if abs(value) < abs_max * 0.7 else "white"
             ax.text(k, j, f'{value:.2f}', ha='center', va='center', 
@@ -1014,39 +776,31 @@ def plot_crl_results(M_opt_norm, cols_to_use, unmixing_matrices_sorted, base_mod
     n_components = M_opt_norm.shape[0]
 
 
-    # Clear any previous plots to prevent overlap
     plt.close('all')  # Close all existing figures
 
-    # Enhanced M_opt_norm visualization
     fig_M_opt, ax_M_opt = plt.subplots(figsize=(10, 8))  # Increased figure size for better spacing
     plt.figure(fig_M_opt.number)  # Ensure we're working with the correct figure
 
-    # Set up the heatmap
     abs_max = np.abs(M_opt_norm).max()
     norm = FuncNorm((np.abs, lambda x: x), vmin=0, vmax=abs_max)
     M_opt_norm_reversed = M_opt_norm.T[:, ::-1]
     im = ax_M_opt.imshow(M_opt_norm_reversed, cmap=cmap, norm=norm, aspect='auto', origin='upper')
 
-    # Enhanced colorbar
     cbar = fig_M_opt.colorbar(im, ax=ax_M_opt, pad=0.01)
     cbar.ax.set_ylabel('Coefficient Value', fontsize=14, fontweight='bold', rotation=270, labelpad=20)
     cbar.ax.tick_params(labelsize=12)
 
-    # Add axis labels
     ax_M_opt.set_xlabel("Latent Factors", fontsize=16, fontweight='bold', labelpad=10)
     ax_M_opt.set_ylabel("Benchmark Accuracies", fontsize=16, fontweight='bold', labelpad=10)
 
-    # Add x-axis labels in LaTeX format
     x_labels = ['$z_1$', '$z_2$', '$z_3$']
     ax_M_opt.set_xticks(np.arange(len(x_labels)))
     ax_M_opt.set_xticklabels(x_labels, fontsize=14, fontweight='bold')
 
-    # Add y-axis labels
     y_labels = benchmarks
     ax_M_opt.set_yticks(np.arange(len(y_labels)))
     ax_M_opt.set_yticklabels(y_labels, fontsize=14, fontweight='bold')
 
-    # Add text annotations with adaptive color
     for (j, k), value in np.ndenumerate(M_opt_norm_reversed):
         color = "black" if abs(value) < abs_max * 0.7 else "white"
         ax_M_opt.text(k, j, f'{value:.2f}', ha='center', va='center', 
@@ -1056,17 +810,9 @@ def plot_crl_results(M_opt_norm, cols_to_use, unmixing_matrices_sorted, base_mod
     ax_M_opt.set_yticks(np.arange(-.5, len(y_labels), 1), minor=True)
     ax_M_opt.grid(False)
 
-    # Ensure proper layout with enough margins
     fig_M_opt.tight_layout(pad=1.5)
-
-    # Save with high DPI to maintain quality (optional)
-    # plt.savefig('benchmark_latent_factors.png', dpi=300, bbox_inches='tight')
-
-    
-    # Get covariance plot
     fig_cov = plot_covariance_matrices(cov_noise, base_models)
     
-    # Add summary information
     print(f"Summary of Inexactness Coefficients:")
     for i, uv in enumerate(unexplained_var):
         print(f"  Model {base_models[i]}: {uv:.4f}")
@@ -1078,34 +824,21 @@ def return_crl_results(M_opt_norm, cols_to_use, unmixing_matrices_sorted, base_m
 
     unexplained_var = []
 
-    # print("Check orthonormality: ", np.linalg.norm(M_opt_norm @ M_opt_norm.T - np.identity(M_opt_norm.shape[0])))
     fig_unmixing_ica, fig_weight, unexplained_var = [], [], []
     
     for i, um in enumerate(unmixing_matrices_sorted):
-        
         transformed_matrix = np.linalg.inv(recover_Bk(um, M_opt_norm)) # This is (B_k * H * G)^{-1}
-
         cov_sqt = np.linalg.inv(transformed_matrix) @ M_opt_norm @ left_inv(um)
 
-        # Compute the absolute values of the matrix
         abs_cov = np.abs(cov_sqt**2)
-        
-        # Extract the diagonal elements
         diag = np.diag(abs_cov)
-        
-        # Sum the absolute values of each row and subtract the diagonal elements
         off_diag_sum = np.sum(abs_cov, axis=1) - diag
-        
-        # Compute the ratio for each row
         ratios = off_diag_sum / np.sum(abs_cov, axis=1)
         
-        # Sum all the ratios to get the final value
+        # Sum all the ratios
         total_sum = np.sum(ratios)
-
         cov = cov_sqt.T @ cov_sqt
-
         P = np.tril(transformed_matrix, k=-1)
-        
         unexplained_var.append(total_sum/cov.shape[0])       
     
     return unexplained_var
